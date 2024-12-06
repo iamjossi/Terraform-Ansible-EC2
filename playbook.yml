@@ -15,11 +15,13 @@
         security_group: ec2-security-group
         tag_name:
           Name: The_Village_School
+        private_key_file: /home/jossi/Girl.pem  # Update this to the correct location of the private key file
+
       tasks:
         - name: Start ssh-agent and add key
           shell: |
             eval $(ssh-agent -s)
-            ssh-add {{ lookup('env', 'HOME') }}/.ssh/Girl.pem
+            ssh-add {{ private_key_file }}
           run_once: true
 
         - name: Create a security group
