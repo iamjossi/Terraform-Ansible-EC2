@@ -60,7 +60,7 @@
     
         - name: Add EC2 instance to Ansible inventory
           add_host:
-            name: "{{ item.public_ip }}"
+            name: "{{ item.public_ip_address }}"
             groups: provisioned
           with_items: "{{ ec2_instance.instances }}"
     
