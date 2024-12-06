@@ -67,6 +67,10 @@
     - name: Configure EC2 Instance
       hosts: provisioned
       become: yes
+      vars:
+        ansible_user: ubuntu
+        ansible_ssh_private_key_file: /path/to/Girl.pem
+
       tasks:
         - name: Install Prometheus
           shell: |
