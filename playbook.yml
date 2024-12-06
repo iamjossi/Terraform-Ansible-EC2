@@ -16,6 +16,12 @@
         tag_name:
           Name: The_Village_School
       tasks:
+        - name: Start ssh-agent and add key
+         shell: |
+          eval $(ssh-agent -s)
+          ssh-add /home/jossi/Girl.pem
+         run_once: true
+
         - name: Create a security group
           amazon.aws.ec2_group:
             name: "{{ security_group }}"
@@ -69,8 +75,7 @@
       become: yes
       vars:
         ansible_user: ubuntu
-        ansible_ssh_private_key_file: "/home/jossi/Girl.pem"
-   
+        
       tasks:
         - name: Install Prometheus
           shell: |
