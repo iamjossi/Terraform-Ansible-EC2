@@ -21,7 +21,7 @@
         - name: Start ssh-agent and add key
           shell: |
             eval $(ssh-agent -s)
-            ssh-add {{ private_key_file }}
+            ssh-add {{ lookup('credential', 'SSH', 'file') }}
           run_once: true
 
         - name: Create a security group
