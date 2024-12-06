@@ -76,17 +76,24 @@
           shell: |
             wget https://github.com/prometheus/prometheus/releases/download/v2.50.0/prometheus-2.50.0.linux-amd64.tar.gz
             tar -xvf prometheus-2.50.0.linux-amd64.tar.gz
-            sudo mv prometheus-2.50.0.linux-amd64/prometheus /usr/local/bin/  # Move only the prometheus binary
-            # Optional: Move promtool binary
-            # sudo mv prometheus-2.50.0.linux-amd64/promtool /usr/local/bin/
-            sudo mkdir /etc/prometheus /var/lib/prometheus
-            sudo cp -r /usr/local/bin/prometheus/consoles /etc/prometheus
-            sudo cp -r /usr/local/bin/prometheus/console_libraries /etc/prometheus
-            sudo useradd -M -r -s /bin/false prometheus
-            sudo chown -R prometheus:prometheus /etc/prometheus /var/lib/prometheus
-            sudo systemctl start prometheus
-          args:
-            executable: /bin/bash
+            sudo mv prometheus-2.50.0.linux-amd64/prometheus /usr/local/bin/
+            sudo mv prometheus-2.50.0.linux-amd64/promtool /usr/local/bin/
+            sudo mkdir -p /etc/prometheus /var/lib/prometheus
+            sudo cp -r prometheus-2.50.0.linux-amd64/consoles /etc/prometheus
+            sudo cp -r prometheus-2.50.0.linux-amd64/console_libraries /etc/prometheus
+      # Check if user exists and create if needed
+            user:
+      name: prometheus
+      append: yes
+      state: present
+    # Create systemd service file
+      template:
+      src: prometheus.service.j2
+      dest: /etc/systemd/system/prometheus.service
+    # Reload systemd and start Prometheus
+    systemd:
+      name: prometheus
+      state: restarted
     
         - name: Install Grafana
           shell: |
