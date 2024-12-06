@@ -17,10 +17,10 @@
           Name: The_Village_School
       tasks:
         - name: Start ssh-agent and add key
-         shell: |
-          eval $(ssh-agent -s)
-          ssh-add /home/jossi/Girl.pem
-         run_once: true
+          ansible.builtin.shell: |
+            eval $(ssh-agent -s)
+            ssh-add /home/jossi/Girl.pem
+          run_once: true
 
         - name: Create a security group
           amazon.aws.ec2_group:
