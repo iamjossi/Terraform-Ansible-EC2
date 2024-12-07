@@ -75,6 +75,7 @@
     ecr_repository: schoolapp
     ecr_image: schoolapp
     ecr_region: eu-west-2
+    ecr_url: "{{ ACCOUNT_ID }}.dkr.ecr.{{ AWS_REGION }}.amazonaws.com"
   tasks:
     - name: Download Dockers GPG Key
       get_url:
