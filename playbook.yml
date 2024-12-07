@@ -91,7 +91,7 @@
       when: ansible_distribution in ["Ubuntu", "Debian"]
 
     - name: Install AWS CLI and Docker (Amazon Linux)
-      yum:
+      apt:
         name:
           - awscli
           - docker
