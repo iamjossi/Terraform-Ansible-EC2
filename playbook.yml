@@ -1,5 +1,5 @@
 ---
-- name: Provision EC2 with Docker and AWS Backup
+- name: Provision EC2 with Docker
   hosts: localhost
   connection: local
   gather_facts: False
@@ -80,49 +80,13 @@
     - name: Update known_hosts file
       shell: ssh-keyscan -H {{ inventory_hostname }} >> ~/.ssh/known_hosts
 
-    - name: Update package list
-      apt:
-        update_cache: yes
-
-    - name: Install Docker
-      apt:
-        name:
-          - docker.io
-        state: present
-        install_recommends: yes
-
-    - name: Start and enable Docker
-      service:
-        name: docker
-        state: started
-        enabled: yes
-
-    - name: Install Python pip
-      apt:
-        name: python3-pip
-        state: present
-
-    - name: Install AWS CLI
-      pip:
-        name: awscli
-        state: present
-
-    - name: Login to ECR
+    - name: Install and Configure Docker
       shell: |
-        aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin 637423240589.dkr.ecr.eu-west-2.amazonaws.com
-
-    - name: Pull Docker image from ECR
-      docker_image:
-        name: 637423240589.dkr.ecr.eu-west-2.amazonaws.com/schoolapp:latest
-        source: pull
-
-    - name: Run Docker container
-      docker_container:
-        name: schoolapp
-        image: 637423240589.dkr.ecr.eu-west-2.amazonaws.com/schoolapp:latest
-        state: started
-        ports:
-          - "3000:3000"
+        sudo apt update -y
+        sudo apt install docker.io -y
+        sudo systemctl start docker
+        sudo systemctl enable docker
+        sudo docker run -d -p 3000:3000 schoolapp:latest
 
     - name: Enable AWS Backup
       amazon.aws.backup_plan:
