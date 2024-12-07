@@ -76,20 +76,23 @@
     ecr_image: schoolapp
     ecr_region: eu-west-2
   tasks:
-    - name: Add Docker Repository
-      apt_repository:
-        repo: deb [arch=$(dpkg --architecture)
-          signed-by=/usr/share/keyrings/docker-archive-keyring.gpg]
-          https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable
-          https://download.docker.com/linux/ubuntu/gpg
-        state: present
+    - name: Download Dockers GPG Key
+      get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: /etc/apt/keyrings/docker.asc
+        mode: 0644
+    - name: Add Docker Repository to apt sources
+      copy:
+        content: |
+          deb[arch={{ arch_mapping[ansible_architecture] }} signed-by/etc/apt/keyrings/docker.asc]
+             https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
+        dest: /etc/apt/sourceslist.d/docker.list
 
     - name: Install Docker
       apt:
-        name:
-          - docker.io
+        name: docker-ce
         state: present
-        install_recommends: yes
+        update_cache: yes
 
     - name: Start and Enable Docker
       service:
