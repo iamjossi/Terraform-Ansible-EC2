@@ -97,6 +97,12 @@
         state: started
         enabled: yes
 
+    - name: Install AWS CLI
+      apt:
+        name: awscli
+        state: present
+        install_recommends: yes    
+
     - name: Login to ECR
       shell: |
         aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin 637423240589.dkr.ecr.eu-west-2.amazonaws.com
