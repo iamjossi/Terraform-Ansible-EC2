@@ -47,7 +47,7 @@
         rules_egress:
           - proto: all
             cidr_ip: 0.0.0.0/0
-      register: basic_firewall
+        register: basic_firewall
 
     - name: Launch EC2 Instance
       amazon.aws.ec2_instance:
@@ -59,7 +59,7 @@
         key_name: "{{ keypair }}"
         count: "{{ count }}"
         tags: "{{ tag_name }}"
-      register: ec2_instance
+        register: ec2_instance
 
     - name: Add EC2 Instance to Ansible Inventory
       add_host:
@@ -67,9 +67,7 @@
         groups: provisioned
       with_items: "{{ ec2_instance.instances }}"
 
--    ecr_repository: schoolapp
-    ecr_image: schoolapp
- name: Configure EC2 Instance
+- name: Configure EC2 Instance
   hosts: provisioned
   become: yes
   gather_facts: yes
@@ -80,37 +78,46 @@
     ansible_ssh_common_args: '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
     aws_access_key_id: "{{ lookup('env', 'ACCESS_KEY') }}"
     aws_secret_access_key: "{{ lookup('env', 'SECRET_ACCESS_KEY') }}"
+    ecr_repository: schoolapp
+    ecr_image: schoolapp
     ecr_region: eu-west-2
-- name: Add Docker Repository
-  apt_repository:
-    repo: deb [arch=$(dpkg --architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable
-    repo_key: https://download.docker.com/linux/ubuntu/gpg
-  
+
   tasks:
+    # Add Docker Repository
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb [arch=$(dpkg --architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable
+        repo_key: https://download.docker.com/linux/ubuntu/gpg
+
+    # Install Docker
     - name: Install Docker
       apt:
-        name: docker.io
+        name: docker-ce
         state: present
         update_cache: yes
         install_recommends: yes
 
+    # Start and Enable Docker
     - name: Start and Enable Docker
       service:
         name: docker
         state: started
         enabled: yes
 
+    # Login to AWS ECR
     - name: Login to AWS ECR
       docker_login:
         registry: "{{ ecr_region }}.dkr.ecr.amazonaws.com"
         username: AWS
         password: "{{ aws_access_key_id }}{{ aws_secret_access_key }}"
 
+    # Pull Docker Image from ECR
     - name: Pull Docker Image from ECR
       docker_image:
         name: "{{ ecr_region }}.dkr.ecr.amazonaws.com/{{ ecr_repository }}/{{ ecr_image }}:latest"
         source: pull
 
+    # Run Docker Container
     - name: Run Docker Container
       docker_container:
         name: schoolapp
@@ -119,6 +126,7 @@
         ports:
           - 3000:3000
 
+    # Enable AWS Backup
     - name: Enable AWS Backup
       amazon.aws.backup_plan:
         name: EC2BackupPlan
@@ -131,6 +139,7 @@
               delete_after: 90
       register: backup_plan
 
+    # Attach EC2 to Backup Plan
     - name: Attach EC2 to Backup Plan
       amazon.aws.backup_selection:
         backup_plan_id: "{{ backup_plan.id }}"
