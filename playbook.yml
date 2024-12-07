@@ -96,16 +96,16 @@
         name: docker
         state: started
         enabled: yes
-        
-   - name: Install Python pip
-     apt:
-       name: python3-pip
-       state: present  
+
+    - name: Install Python pip
+      apt:
+        name: python3-pip
+        state: present
 
     - name: Install AWS CLI
       pip:
         name: awscli
-        state: present  
+        state: present
 
     - name: Login to ECR
       shell: |
