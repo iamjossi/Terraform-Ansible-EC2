@@ -71,7 +71,7 @@
 - name: Configure EC2 Instance
   hosts: provisioned
   become: yes
-  gather_facts: no
+  gather_facts: yes
 
   vars:
     ansible_user: ubuntu
