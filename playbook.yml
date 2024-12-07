@@ -5,7 +5,7 @@
   vars:
     ansible_python_interpreter: /usr/bin/python3.12
     keypair: Girl
-    instance_type: t2.micro
+    instance_type: t2.medium
     image_id: ami-05c172c7f0d3aed00
     wait: yes
     group: webserver
