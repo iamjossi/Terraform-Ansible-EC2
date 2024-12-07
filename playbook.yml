@@ -109,7 +109,7 @@
         enabled: yes
     - name: Login to AWS ECR
       docker_login:
-        registry: "{{ ecr_region }}.dkr.ecr.amazonaws.com"
+        registry: "{{ ECR_URL }}"
         username: AWS
         password: "{{ lookup('env', 'ACCESS_KEY') }}:{{ lookup('env', 'SECRET_ACCESS_KEY') }}"
     - name: Pull Docker Image from ECR
