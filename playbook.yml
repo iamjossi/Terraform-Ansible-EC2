@@ -72,18 +72,33 @@
   hosts: provisioned
   become: yes
 
-  vars:
-    ansible_user: ubuntu
-
   tasks:
+    - name: Update package list
+      apt:
+        update_cache: yes
+      when: ansible_distribution in ["Ubuntu", "Debian"]
+
     - name: Install AWS CLI and Docker
-      become: yes
       apt:
         name:
           - awscli
           - docker.io
         state: present
-        update_cache: yes
+      when: ansible_distribution in ["Ubuntu", "Debian"]
+
+    - name: Install AWS CLI and Docker (Amazon Linux)
+      yum:
+        name:
+          - awscli
+          - docker
+        state: present
+      when: ansible_distribution == "Amazon"
+
+    - name: Start and enable Docker
+      service:
+        name: docker
+        state: started
+        enabled: yes
 
     - name: Login to ECR
       shell: |
