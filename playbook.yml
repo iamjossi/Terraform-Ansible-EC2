@@ -37,7 +37,6 @@
         cidr_ip: 0.0.0.0/0
   tasks:
     - name: Create Security Group
-      block: null
       amazon.aws.ec2_group:
         name: "{{ security_group }}"
         description: Security Group for webserver
@@ -47,9 +46,8 @@
           - proto: all
             cidr_ip: 0.0.0.0/0
       register: basic_firewall
-      rescue: null
+      
     - name: Launch EC2 Instance
-      block: null
       amazon.aws.ec2_instance:
         security_group: "{{ security_group }}"
         instance_type: "{{ instance_type }}"
@@ -60,14 +58,13 @@
         count: "{{ count }}"
         tags: "{{ tag_name }}"
       register: ec2_instance
-      rescue: null
+    
     - name: Add EC2 Instance to Ansible Inventory
-      block: null
       add_host:
         name: "{{ item.public_ip_address }}"
         groups: provisioned
       with_items: "{{ ec2_instance.instances }}"
-      rescue: null
+    
 - name: Configure EC2 Instance
   hosts: provisioned
   become: yes
