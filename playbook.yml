@@ -77,7 +77,7 @@
     ansible_user: ubuntu
 
   tasks:
-     - name: Update known_hosts file
+    - name: Update known_hosts file
       shell: ssh-keyscan -H {{ inventory_hostname }} >> ~/.ssh/known_hosts
 
     - name: Update package list
