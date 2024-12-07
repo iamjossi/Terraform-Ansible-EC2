@@ -49,7 +49,7 @@
             cidr_ip: 0.0.0.0/0
 
     - name: Launch EC2 Instance
-      amazon.aws.ec2_instance_info:
+      amazon.aws.ec2:
         security_group: "{{ security_group }}"
         instance_type: "{{ instance_type }}"
         image_id: "{{ image_id }}"
@@ -58,7 +58,7 @@
         key_name: "{{ keypair }}"
         count: "{{ count }}"
         tags: "{{ tag_name }}"
-        register: ec2_instance_info
+        register: ec2_instance.
 
     - name: Add EC2 Instance to Ansible Inventory
       add_host:
