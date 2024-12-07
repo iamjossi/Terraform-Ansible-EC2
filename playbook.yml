@@ -81,7 +81,8 @@
         repo: deb [arch=$(dpkg --architecture)
           signed-by=/usr/share/keyrings/docker-archive-keyring.gpg]
           https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable
-        repo_key: https://download.docker.com/linux/ubuntu/gpg
+          https://download.docker.com/linux/ubuntu/gpg
+        state: present
 
     - name: Install Docker
       apt:
@@ -89,7 +90,7 @@
           - docker.io
         state: present
         install_recommends: yes
-        
+
     - name: Start and Enable Docker
       service:
         name: docker
