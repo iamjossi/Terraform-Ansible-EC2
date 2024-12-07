@@ -1,9 +1,7 @@
----
 - name: Provision EC2 with Docker and AWS Backup
   hosts: localhost
   connection: local
-  gather_facts: False
-
+  gather_facts: false
   vars:
     ansible_python_interpreter: /usr/bin/python3.12
     keypair: Girl
@@ -37,48 +35,43 @@
         from_port: 3000
         to_port: 3000
         cidr_ip: 0.0.0.0/0
-
   tasks:
     - name: Create Security Group
-      block:
+      block: null
       amazon.aws.ec2_group:
-        name: '{{ security_group }}'
+        name: "{{ security_group }}"
         description: Security Group for webserver
-        region: '{{ region }}'
-        rules: '{{ security_group_rules }}'
+        region: "{{ region }}"
+        rules: "{{ security_group_rules }}"
         rules_egress:
           - proto: all
             cidr_ip: 0.0.0.0/0
       register: basic_firewall
-      rescue:
-
+      rescue: null
     - name: Launch EC2 Instance
-      block:
+      block: null
       amazon.aws.ec2_instance:
-        security_group: '{{ security_group }}'
-        instance_type: '{{ instance_type }}'
-        image_id: '{{ image_id }}'
-        wait: '{{ wait }}'
-        region: '{{ region }}'
-        key_name: '{{ keypair }}'
-        count: '{{ count }}'
-        tags: '{{ tag_name }}'
+        security_group: "{{ security_group }}"
+        instance_type: "{{ instance_type }}"
+        image_id: "{{ image_id }}"
+        wait: "{{ wait }}"
+        region: "{{ region }}"
+        key_name: "{{ keypair }}"
+        count: "{{ count }}"
+        tags: "{{ tag_name }}"
       register: ec2_instance
-      rescue:
-
+      rescue: null
     - name: Add EC2 Instance to Ansible Inventory
-      block:
+      block: null
       add_host:
-        name: '{{ item.public_ip_address }}'
+        name: "{{ item.public_ip_address }}"
         groups: provisioned
-      with_items: '{{ ec2_instance.instances }}'
-      rescue:
-
+      with_items: "{{ ec2_instance.instances }}"
+      rescue: null
 - name: Configure EC2 Instance
   hosts: provisioned
   become: yes
   gather_facts: yes
-
   vars:
     ansible_user: ubuntu
     aws_access_key_id: ACCESS_KEY
@@ -86,58 +79,52 @@
     ecr_repository: schoolapp
     ecr_image: schoolapp
     ecr_region: eu-west-2
-
   tasks:
     - name: Update known_hosts file
       shell: ssh-keyscan -H {{ inventory_hostname }} >> ~/.ssh/known_hosts
-
     - name: Install Docker
       apt:
         name:
           - docker.io
         state: present
         install_recommends: yes
-
     - name: Start and Enable Docker
       service:
         name: docker
         state: started
         enabled: yes
-
     - name: Login to AWS ECR
       docker_login:
-        registry: '{{ ecr_region }}.dkr.ecr.amazonaws.com'
+        registry: "{{ ecr_region }}.dkr.ecr.amazonaws.com"
         username: AWS
-        password: '{{ aws_access_key_id }}{{ aws_secret_access_key }}'
-
+        password: "{{ aws_access_key_id }}{{ aws_secret_access_key }}"
     - name: Pull Docker Image from ECR
       docker_image:
-        name: '{{ ecr_region }}.dkr.ecr.amazonaws.com/{{ ecr_repository }}/{{ ecr_image }}:latest'
+        name: "{{ ecr_region }}.dkr.ecr.amazonaws.com/{{ ecr_repository }}/{{ ecr_image
+          }}:latest"
         source: pull
-
     - name: Run Docker Container
       docker_container:
         name: schoolapp
-        image: '{{ ecr_region }}.dkr.ecr.amazonaws.com/{{ ecr_repository }}/{{ ecr_image }}:latest'
+        image: "{{ ecr_region }}.dkr.ecr.amazonaws.com/{{ ecr_repository }}/{{ ecr_image
+          }}:latest"
         state: started
         ports:
-          - "3000:3000"
-
+          - 3000:3000
     - name: Enable AWS Backup
       amazon.aws.backup_plan:
         name: EC2BackupPlan
         rules:
           - rule_name: DailyBackup
             target_backup_vault_name: Default
-            schedule_expression: 'cron(0 12 * * ? *)'
+            schedule_expression: cron(0 12 * * ? *)
             lifecycle:
               cold_storage_after: 30
               delete_after: 90
       register: backup_plan
-
     - name: Attach EC2 to Backup Plan
       amazon.aws.backup_selection:
-        backup_plan_id: '{{ backup_plan.id }}'
+        backup_plan_id: "{{ backup_plan.id }}"
         selection_name: EC2BackupSelection
         resources:
-          - '{{ ec2_instance.instances[0].arn }}'
+          - "{{ ec2_instance.instances[0].arn }}"
