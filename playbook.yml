@@ -76,16 +76,23 @@
       ansible_user: ubuntu
   
     tasks:
-      - name: Install and Start Docker
-        apt:
-          name: docker-ce
-          state: present
-        notify: start docker
-  
-      - name: Pull and Run Docker Container
-        docker_container:
-          name: schoolapp
-          image: schoolapp:latest
+  - name: Pull and Run Docker Image from ECR
+    become: yes
+    tasks:
+  - name: Login to ECR
+      shell: |
+        aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin 637423240589.dkr.ecr.eu-west-2.amazonaws.com
+
+ - name: Pull Docker image from ECR
+   docker_image:
+   name: 637423240589.dkr.ecr.eu-west-2.amazonaws.com/schoolapp:latest
+   source: pull
+
+    - name: Run Docker container
+      docker_container:
+        name: schoolapp
+        image: 637423240589.dkr.ecr.eu-west-2.amazonaws.com/schoolapp:latest
+        state: started
           ports:
             - "3000:3000"
   
