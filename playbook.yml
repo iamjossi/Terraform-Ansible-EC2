@@ -84,7 +84,7 @@
     - name: Add Docker Repository to apt sources
       copy:
         content: |
-          deb[arch={{ arch_mapping[ansible_architecture] }} signed-by/etc/apt/keyrings/docker.asc]
+          deb[arch={{ arch={{ansible_architecture }} signed-by/etc/apt/keyrings/docker.asc]
              https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
         dest: /etc/apt/sourceslist.d/docker.list
 
