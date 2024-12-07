@@ -71,8 +71,8 @@
   gather_facts: yes
   vars:
     ansible_user: ubuntu
-    ansible_ssh_private_key_file: "/var/lib/jenkins/workspace/Ansible/Girl.pem"
-    ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+    ansible_ssh_private_key_file: "{{ credentials.Girl.keyFile.path }}"
+
   vars:
     ansible_user: ubuntu
     aws_access_key_id: ACCESS_KEY
