@@ -55,7 +55,7 @@
         key_name: "{{ keypair }}"
         count: "{{ count }}"
         tags: "{{ tag_name }}"
-        register: ec2_instance.
+        register: ec2_instance_info
     - name: Add EC2 Instance to Ansible Inventory
       add_host:
         name: "{{ item.public_ip_address }}"
