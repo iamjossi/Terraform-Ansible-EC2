@@ -1,5 +1,5 @@
 ---
-- name: Provision EC2 with Docker
+- name: Provision EC2 with Docker and AWS Backup
   hosts: localhost
   connection: local
   gather_facts: False
@@ -7,7 +7,7 @@
   vars:
     ansible_python_interpreter: /usr/bin/python3.12
     keypair: Girl
-    instance_type: t2.medium
+    instance_type: t2.micro
     image_id: ami-05c172c7f0d3aed00
     wait: yes
     group: webserver
@@ -40,6 +40,7 @@
 
   tasks:
     - name: Create Security Group
+      block:
       amazon.aws.ec2_group:
         name: '{{ security_group }}'
         description: Security Group for webserver
@@ -49,8 +50,10 @@
           - proto: all
             cidr_ip: 0.0.0.0/0
       register: basic_firewall
+      rescue:
 
     - name: Launch EC2 Instance
+      block:
       amazon.aws.ec2_instance:
         security_group: '{{ security_group }}'
         instance_type: '{{ instance_type }}'
@@ -61,12 +64,15 @@
         count: '{{ count }}'
         tags: '{{ tag_name }}'
       register: ec2_instance
+      rescue:
 
     - name: Add EC2 Instance to Ansible Inventory
+      block:
       add_host:
         name: '{{ item.public_ip_address }}'
         groups: provisioned
       with_items: '{{ ec2_instance.instances }}'
+      rescue:
 
 - name: Configure EC2 Instance
   hosts: provisioned
@@ -75,37 +81,47 @@
 
   vars:
     ansible_user: ubuntu
+    aws_access_key_id: ACCESS_KEY
+    aws_secret_access_key: SECRET_ACCESS_KEY
+    ecr_repository: schoolapp
+    ecr_image: schoolapp
+    ecr_region: eu-west-2
 
   tasks:
     - name: Update known_hosts file
       shell: ssh-keyscan -H {{ inventory_hostname }} >> ~/.ssh/known_hosts
 
-    - name: Install and Configure Docker
-      block:
-        - name: Install Docker
-          apt:
-            name:
-              - docker.io
-            state: present
-            install_recommends: yes
+    - name: Install Docker
+      apt:
+        name:
+          - docker.io
+        state: present
+        install_recommends: yes
 
-        - name: Start and Enable Docker
-          service:
-            name: docker
-            state: started
-            enabled: yes
+    - name: Start and Enable Docker
+      service:
+        name: docker
+        state: started
+        enabled: yes
 
-        - name: Run Docker Container
-          docker_container:
-            name: schoolapp
-            image: schoolapp:latest
-            state: started
-            ports:
-              - "3000:3000"
-      rescue:
-        - name: Debug Docker Installation
-          debug:
-            msg: "Docker installation failed with error: {{ ansible_failed_result }}"
+    - name: Login to AWS ECR
+      docker_login:
+        registry: '{{ ecr_region }}.dkr.ecr.amazonaws.com'
+        username: AWS
+        password: '{{ aws_access_key_id }}{{ aws_secret_access_key }}'
+
+    - name: Pull Docker Image from ECR
+      docker_image:
+        name: '{{ ecr_region }}.dkr.ecr.amazonaws.com/{{ ecr_repository }}/{{ ecr_image }}:latest'
+        source: pull
+
+    - name: Run Docker Container
+      docker_container:
+        name: schoolapp
+        image: '{{ ecr_region }}.dkr.ecr.amazonaws.com/{{ ecr_repository }}/{{ ecr_image }}:latest'
+        state: started
+        ports:
+          - "3000:3000"
 
     - name: Enable AWS Backup
       amazon.aws.backup_plan:
@@ -125,4 +141,3 @@
         selection_name: EC2BackupSelection
         resources:
           - '{{ ec2_instance.instances[0].arn }}'
-          
