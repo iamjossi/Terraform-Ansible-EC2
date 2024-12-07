@@ -69,9 +69,9 @@
   hosts: provisioned
   become: yes
   gather_facts: yes
-  vars:
-    ansible_user: ubuntu
-    ansible_ssh_private_key_file: "{{ lookup('env', 'ANSIBLE_PRIVATE_KEY') }}"
+   tasks:
+    - name: Update known_hosts file
+      shell: ssh-keyscan -H {{ inventory_hostname }} >> ~/.ssh/known_hosts
   vars:
     ansible_user: ubuntu
     aws_access_key_id: ACCESS_KEY
@@ -79,9 +79,7 @@
     ecr_repository: schoolapp
     ecr_image: schoolapp
     ecr_region: eu-west-2
-  tasks:
-    - name: Update known_hosts file
-      shell: ssh-keyscan -H {{ inventory_hostname }} >> ~/.ssh/known_hosts
+    
     - name: Install Docker
       apt:
         name:
