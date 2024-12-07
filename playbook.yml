@@ -81,12 +81,31 @@
       shell: ssh-keyscan -H {{ inventory_hostname }} >> ~/.ssh/known_hosts
 
     - name: Install and Configure Docker
-      shell: |
-        sudo apt update -y
-        sudo apt install docker.io -y
-        sudo systemctl start docker
-        sudo systemctl enable docker
-        sudo docker run -d -p 3000:3000 schoolapp:latest
+      block:
+        - name: Install Docker
+          apt:
+            name:
+              - docker.io
+            state: present
+            install_recommends: yes
+
+        - name: Start and Enable Docker
+          service:
+            name: docker
+            state: started
+            enabled: yes
+
+        - name: Run Docker Container
+          docker_container:
+            name: schoolapp
+            image: schoolapp:latest
+            state: started
+            ports:
+              - "3000:3000"
+      rescue:
+        - name: Debug Docker Installation
+          debug:
+            msg: "Docker installation failed with error: {{ ansible_failed_result }}"
 
     - name: Enable AWS Backup
       amazon.aws.backup_plan:
@@ -106,3 +125,4 @@
         selection_name: EC2BackupSelection
         resources:
           - '{{ ec2_instance.instances[0].arn }}'
+          
