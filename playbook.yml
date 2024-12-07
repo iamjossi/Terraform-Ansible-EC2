@@ -76,6 +76,15 @@
     ansible_user: ubuntu
 
   tasks:
+    - name: Install AWS CLI and Docker
+      become: yes
+      apt:
+        name:
+          - awscli
+          - docker.io
+        state: present
+        update_cache: yes
+
     - name: Login to ECR
       shell: |
         aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin 637423240589.dkr.ecr.eu-west-2.amazonaws.com
