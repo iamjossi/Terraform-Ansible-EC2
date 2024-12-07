@@ -78,7 +78,7 @@
     tasks:
       - name: Install and Start Docker
         apt:
-          name: docker.io
+          name: docker-ce
           state: present
         notify: start docker
   
