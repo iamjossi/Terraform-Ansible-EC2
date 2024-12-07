@@ -71,6 +71,10 @@
   gather_facts: yes
   vars:
     ansible_user: ubuntu
+    ansible_ssh_private_key_file: "/var/lib/jenkins/workspace/Ansible/Girl.pem"
+
+  vars:
+    ansible_user: ubuntu
     aws_access_key_id: ACCESS_KEY
     aws_secret_access_key: SECRET_ACCESS_KEY
     ecr_repository: schoolapp
