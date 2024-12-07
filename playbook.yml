@@ -45,6 +45,7 @@
         rules_egress:
           - proto: all
             cidr_ip: 0.0.0.0/0
+      register: basic_firewall
     - name: Launch EC2 Instance
       amazon.aws.ec2_instance:
         security_group: "{{ security_group }}"
@@ -55,7 +56,7 @@
         key_name: "{{ keypair }}"
         count: "{{ count }}"
         tags: "{{ tag_name }}"
-        register: ec2_instance_info
+      register: ec2_instance
     - name: Add EC2 Instance to Ansible Inventory
       add_host:
         name: "{{ item.public_ip_address }}"
@@ -81,12 +82,14 @@
           signed-by=/usr/share/keyrings/docker-archive-keyring.gpg]
           https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable
         repo_key: https://download.docker.com/linux/ubuntu/gpg
+
     - name: Install Docker
       apt:
-        name: docker-ce
+        name:
+          - docker.io
         state: present
-        update_cache: yes
         install_recommends: yes
+        
     - name: Start and Enable Docker
       service:
         name: docker
@@ -99,14 +102,12 @@
         password: "{{ aws_access_key_id }}{{ aws_secret_access_key }}"
     - name: Pull Docker Image from ECR
       docker_image:
-        name: "{{ ecr_region }}.dkr.ecr.amazonaws.com/{{ ecr_repository }}/{{ ecr_image
-          }}:latest"
+        name: "{{ ecr_region }}.dkr.ecr.amazonaws.com/{{ ecr_repository }}/{{ ecr_image}}:latest"
         source: pull
     - name: Run Docker Container
       docker_container:
         name: schoolapp
-        image: "{{ ecr_region }}.dkr.ecr.amazonaws.com/{{ ecr_repository }}/{{ ecr_image
-          }}:latest"
+        image: "{{ ecr_region }}.dkr.ecr.amazonaws.com/{{ ecr_repository }}/{{ ecr_image }}:latest"
         state: started
         ports:
           - 3000:3000
