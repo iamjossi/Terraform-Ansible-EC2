@@ -98,10 +98,9 @@
         enabled: yes
 
     - name: Install AWS CLI
-      apt:
+      pip:
         name: awscli
-        state: present
-        install_recommends: yes    
+        state: present  
 
     - name: Login to ECR
       shell: |
