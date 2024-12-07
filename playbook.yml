@@ -85,8 +85,9 @@
   tasks:
     - name: Install Docker
       apt:
-        name: docker.io -y
+        name: docker-ce
         state: present
+        update_cache: yes
         install_recommends: yes
 
     - name: Start and Enable Docker
