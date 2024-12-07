@@ -81,6 +81,14 @@
         url: https://download.docker.com/linux/ubuntu/gpg
         dest: /etc/apt/keyrings/docker.asc
         mode: 0644
+        
+    - name: Add Docker GPG key to apt keyring
+      apt_key:
+        file: /etc/apt/keyrings/docker.asc
+        state: present
+      become: yes
+
+        
     - name: Add Docker Repository to apt sources
       copy:
         content: |
