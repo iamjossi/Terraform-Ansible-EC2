@@ -76,25 +76,22 @@
     ansible_user: ubuntu
 
   tasks:
-    - name: Pull and Run Docker Image from ECR
-      become: yes
-      tasks:
-        - name: Login to ECR
-          shell: |
-            aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin 637423240589.dkr.ecr.eu-west-2.amazonaws.com
+    - name: Login to ECR
+      shell: |
+        aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin 637423240589.dkr.ecr.eu-west-2.amazonaws.com
 
-        - name: Pull Docker image from ECR
-          docker_image:
-            name: 637423240589.dkr.ecr.eu-west-2.amazonaws.com/schoolapp:latest
-            source: pull
+    - name: Pull Docker image from ECR
+      docker_image:
+        name: 637423240589.dkr.ecr.eu-west-2.amazonaws.com/schoolapp:latest
+        source: pull
 
-        - name: Run Docker container
-          docker_container:
-            name: schoolapp
-            image: 637423240589.dkr.ecr.eu-west-2.amazonaws.com/schoolapp:latest
-            state: started
-            ports:
-              - "3000:3000"
+    - name: Run Docker container
+      docker_container:
+        name: schoolapp
+        image: 637423240589.dkr.ecr.eu-west-2.amazonaws.com/schoolapp:latest
+        state: started
+        ports:
+          - "3000:3000"
 
     - name: Enable AWS Backup
       amazon.aws.backup_plan:
