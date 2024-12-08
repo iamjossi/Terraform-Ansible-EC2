@@ -120,7 +120,9 @@
         curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
         unzip awscliv2.zip
         sudo ./aws/install
-
+      register: aws_cli_installation
+      ignore_errors: yes
+      
     - name: Wait for CLI
       wait_for:
         path: /usr/local/bin/aws
