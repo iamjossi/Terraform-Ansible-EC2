@@ -110,6 +110,11 @@
         state: started
         enabled: yes
 
+    - name: Install unzip
+      apt:
+        name: unzip
+        state: present
+
     - name: Install AWS CLI
       shell: |
         curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
