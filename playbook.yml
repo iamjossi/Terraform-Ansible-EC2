@@ -111,8 +111,8 @@
     - name: Login to AWS ECR
       docker_login:
         registry: "{{ ECR_URL }}"
-        username: AWS
-        password: "{{ lookup('env', 'ACCESS_KEY') }}:{{ lookup('env', 'SECRET_ACCESS_KEY') }}"
+        aws_access_key: "{{ lookup('env', 'ACCESS_KEY') }}"
+        aws_secret_key: "{{ lookup('env', 'SECRET_ACCESS_KEY') }}"
     - name: Pull Docker Image from ECR
       docker_image:
         name: "{{ ecr_region }}.dkr.ecr.amazonaws.com/{{ ecr_repository }}/{{ ecr_image}}:latest"
