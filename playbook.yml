@@ -144,12 +144,12 @@
        AWS_SECRET_ACCESS_KEY: "{{ lookup('env', 'SECRET_ACCESS_KEY') }}"
     - name: Pull Docker Image from ECR
       docker_image:
-        name: "{{ ecr_region }}.dkr.ecr.amazonaws.com/{{ ecr_repository }}/{{ ecr_image}}:latest"
+        name: "{{ ecr_url }}.dkr.ecr.amazonaws.com/{{ ecr_repository }}/{{ ecr_image}}:latest"
         source: pull
     - name: Run Docker Container
       docker_container:
         name: schoolapp
-        image: "{{ ecr_region }}.dkr.ecr.amazonaws.com/{{ ecr_repository }}/{{ ecr_image }}:latest"
+        image: "{{ ecr_url }}.dkr.ecr.amazonaws.com/{{ ecr_repository }}/{{ ecr_image }}:latest"
         state: started
         ports:
           - 3000:3000
