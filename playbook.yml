@@ -190,7 +190,7 @@
     - name: Get EC2 Instance Info
       amazon.aws.ec2_instance_info:
         filters:
-          tag_Name: "The_Village_School"
+          tag_name: "The_Village_School"
       register: ec2_instance
       
     - name: Attach EC2 to Backup Plan
