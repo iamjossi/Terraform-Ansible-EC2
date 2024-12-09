@@ -198,4 +198,4 @@
         backup_plan_id: "{{ backup_plan_info.backup_plans[0].backup_plan_id }}"
         selection_name: EC2BackupSelection
      resources:
-      - "{{ ec2_instance.instances[0].instance_id }}"
+       - "{{ ec2_instance.instances[0].instance_id }}"
