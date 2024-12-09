@@ -164,38 +164,4 @@
         ports:
           - 3000:3000
 
-    - name: Create a Backup Vault
-      amazon.aws.backup_vault:
-        backup_vault_name: Default
-        region: "{{ lookup('env', 'AWS_REGION') }}"
-      register: backup_vault
-
-    - name: Enable AWS Backup
-      amazon.aws.backup_plan:
-        name: EC2BackupPlan
-        rules:
-          - rule_name: DailyBackup
-            target_backup_vault_name: Default
-            schedule_expression: cron(0 12 * * ? *)
-            lifecycle:
-              move_to_cold_storage_after_days: 30
-              delete_after_days: 120
-      register: backup_plan
-
-    - name: Get Backup Plan ID
-      amazon.aws.backup_plan_info:
-       name: EC2BackupPlan
-      register: backup_plan_info
-
-    - name: Get EC2 Instance Info
-      amazon.aws.ec2_instance_info:
-        filters:
-          tag_name: "The_Village_School"
-      register: ec2_instance
-      
-    - name: Attach EC2 to Backup Plan
-      amazon.aws.backup_selection:
-        backup_plan_id: "{{ backup_plan_info.backup_plans[0].backup_plan_id }}"
-        selection_name: EC2BackupSelection
-      resources:
-       - "{{ ec2_instance.instances[0].instance_id }}"
+  
