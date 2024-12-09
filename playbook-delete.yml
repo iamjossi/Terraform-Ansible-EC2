@@ -1,0 +1,34 @@
+- name: Delete EC2 Instance and Security Group
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    region: eu-west-2
+    security_group: ec2-security-group
+    instance_type: t2.medium
+    image_id: ami-05c172c7f0d3aed00
+    keypair: Girl
+    tag_name:
+      Name: The_Village_School
+
+  tasks:
+    - name: Get EC2 Instance ID
+      amazon.aws.ec2_instance_info:
+        region: "{{ region }}"
+        filters:
+          "tag:Name": "{{ tag_name.Name }}"
+      register: ec2_instance_info
+
+    - name: Delete EC2 Instance
+      amazon.aws.ec2_instance:
+        region: "{{ region }}"
+        state: absent
+        instance_ids: "{{ ec2_instance_info.instances[0].instance_id }}"
+      register: ec2_instance
+
+    - name: Delete Security Group
+      amazon.aws.ec2_group:
+        region: "{{ region }}"
+        state: absent
+        name: "{{ security_group }}"
+      register: basic_firewall
