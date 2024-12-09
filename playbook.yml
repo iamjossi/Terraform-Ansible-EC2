@@ -163,6 +163,13 @@
         state: started
         ports:
           - 3000:3000
+
+    - name: Create a Backup Vault
+      amazon.aws.backup_vault:
+        name: Default
+        region: {{ lookup('env', 'AWS_REGION') }}
+      register: backup_vault
+
     - name: Enable AWS Backup
       amazon.aws.backup_plan:
         name: EC2BackupPlan
@@ -173,6 +180,7 @@
             lifecycle:
               move_to_cold_storage_after_days: 30
               delete_after_days: 120
+              
       register: backup_plan
     - name: Attach EC2 to Backup Plan
       amazon.aws.backup_selection:
