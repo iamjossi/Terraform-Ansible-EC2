@@ -137,11 +137,12 @@
         aws configure set default.region {{ lookup('env', 'AWS_REGION') }}
     
     - name: Login to AWS ECR
-      aws_ecr: 
-        region: "{{ ecr_region }}"
-        access_key: "{{ lookup('env', 'ACCESS_KEY') }}"
-        secret_key: "{{ lookup('env', 'SECRET_ACCESS_KEY') }}"
-        state: login
+      shell: |
+        aws ecr get-login-password --region {{ ecr_region }} | docker login --username AWS --password-stdin {{ ecr_url }}
+      environment:
+        AWS_ACCESS_KEY_ID: "{{ lookup('env', 'ACCESS_KEY') }}"
+        AWS_SECRET_ACCESS_KEY: "{{ lookup('env', 'SECRET_ACCESS_KEY') }}"
+        
     - name: Pull Docker Image from ECR
       docker_image:
         name: "{{ lookup('env', 'ECR_URL') }}/schoolapp/schoolapp:latest"
