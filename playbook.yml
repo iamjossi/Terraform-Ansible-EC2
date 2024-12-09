@@ -145,12 +145,12 @@
         
     - name: Pull Docker Image from ECR
       docker_image:
-        name: "{{ lookup('env', 'ECR_URL') }}/schoolapp/schoolapp:latest"
+        name: "{{ lookup('env', 'ECR_URL') }}/schoolapp:latest"
         source: pull
     - name: Run Docker Container
       docker_container:
         name: schoolapp
-        image: "{{ lookup('env', 'ECR_URL') }}/schoolapp/schoolapp:latest"
+        image: "{{ lookup('env', 'ECR_URL') }}/schoolapp:latest"
         state: started
         ports:
           - 3000:3000
