@@ -182,20 +182,20 @@
               delete_after_days: 120
       register: backup_plan
 
-   - name: Get Backup Plan ID
-     amazon.aws.backup_plan_info:
+    - name: Get Backup Plan ID
+      amazon.aws.backup_plan_info:
        name: EC2BackupPlan
-    register: backup_plan_info
+      register: backup_plan_info
 
     - name: Get EC2 Instance Info
       amazon.aws.ec2_instance_info:
         filters:
-          "tag:Name": "The_Village_School"
-     register: ec2_instance
+          tag_Name: "The_Village_School"
+      register: ec2_instance
       
     - name: Attach EC2 to Backup Plan
       amazon.aws.backup_selection:
         backup_plan_id: "{{ backup_plan_info.backup_plans[0].backup_plan_id }}"
         selection_name: EC2BackupSelection
-     resources:
+      resources:
        - "{{ ec2_instance.instances[0].instance_id }}"
