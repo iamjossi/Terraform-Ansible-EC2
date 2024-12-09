@@ -167,7 +167,7 @@
     - name: Create a Backup Vault
       amazon.aws.backup_vault:
         name: Default
-        region: {{ lookup('env', 'AWS_REGION') }}
+        region: "{{ lookup('env', 'AWS_REGION') }}"
       register: backup_vault
 
     - name: Enable AWS Backup
