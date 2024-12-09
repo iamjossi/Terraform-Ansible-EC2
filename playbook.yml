@@ -163,7 +163,7 @@
             schedule_expression: cron(0 12 * * ? *)
             lifecycle:
               move_to_cold_storage_after_days: 30
-              delete_after_days: 90
+              delete_after_days: 120
       register: backup_plan
     - name: Attach EC2 to Backup Plan
       amazon.aws.backup_selection:
