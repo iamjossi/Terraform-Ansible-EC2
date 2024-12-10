@@ -9,7 +9,7 @@ Build,tag and push image to ECR repository. #Create an ECR repository
 Set up Github with playbook.yml and playbook-delete.yml files
    Playbook.yml provisions the webserver, a security group and pulls the docker image from ECR #run 'which python' to get the python version to use to write the 
    playbook.
-   Playbook-delete.yml is used to delete the resources provisioned when they are no longer needed.
+    Playbook-delete.yml is used to delete the resources provisioned when they are no longer needed.
 
 Use Terraform to provision infrastructure. #Jenkins Server
   Userdata Installs Jenkins, Ansible, Trivy and AWS CLI 
@@ -20,27 +20,27 @@ echo "jenkins ALL=(ALL) NOPASSWD: ALL" | sudo tee -a /etc/sudoers #Access to ins
 
 Copy the Jenskins server public IP:8080 to set up Jenkins or using the URL and password output in terraform.
 Plugins used are:
-   AWS Credentials
-   Ansible
-   Pipeline: Stage View
-   Pipeline: REST API
-   SSH Agent
-   Environment Injector
+   AWS Credentials,
+   Ansible,
+   Pipeline: Stage View,
+   Pipeline: REST API,
+   SSH Agent,
+   Environment Injector,
    Groovy
 
 Tools set up:
-    Groovy
-    Ansible #run 'which ansible' on the jenkins server. copy the path and save here
+    Groovy,
+    Ansible #run 'which ansible' on the jenkins server. copy the path and save here.
 
 Set up credentials:
-    Keypair as Username and private key #used an existing keypair
-    AWS credentials
-    AWS credentials set up as secret text
-    Account ID and Region set up as secret text
+    Keypair as Username and private key #used an existing keypair,
+    AWS credentials,
+    AWS credentials set up as secret text,
+    Account ID and Region set up as secret text,
 
 Create pipelines on jenkins. configure with pipeline script. 
    The Jenkins Setup script checks out github and deploys the playbook.yml file
-   The Jenkins Delete script checks out github and deploys the playboo-delete.yml file
+   The Jenkins Delete script checks out github and deploys the playbook-delete.yml file
 
 
 
