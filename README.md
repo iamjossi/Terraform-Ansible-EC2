@@ -1,18 +1,19 @@
 # Terraform-Ansible-EC2
 
-   STEPS TAKEN TO CREATE THIS APPLICATION.
+   STEPS TAKEN TO CREATE THIS APPLICATION. 
+   
 A simple Nodejs application with Express server, an HTML and CSS file.
 
-Build,tag and push image to ECR repository. #Create an ECR repository
+Build,tag and push image to ECR repository. #Create an ECR repository 
 
 Set up Github with playbook.yml and playbook-delete.yml files
    Playbook.yml provisions the webserver, a security group and pulls the docker image from ECR #run 'which python' to get the python version to use to write the 
-   playbook
-   Playbook-delete.yml is used to delete the resources provisioned when they are no longer needed
+   playbook.
+   Playbook-delete.yml is used to delete the resources provisioned when they are no longer needed.
 
 Use Terraform to provision infrastructure. #Jenkins Server
   Userdata Installs Jenkins, Ansible, Trivy and AWS CLI 
-  Outputs Jenkins URL and password 
+  Outputs Jenkins URL and password.
 
 SSH into Jenkins server and grant it Sudo priviledge using this code:
 echo "jenkins ALL=(ALL) NOPASSWD: ALL" | sudo tee -a /etc/sudoers #Access to install dependancies on the pipeline script
