@@ -148,10 +148,10 @@
     - name: Install Trivy
       become: true
       tasks:
-    - name: Add Trivy repository key
-      apt_key:
-        url: https://aquasecurity.github.io/trivy-repo/deb/public.key
-        state: present
+      - name: Add Trivy repository key
+        apt_key:
+          url: https://aquasecurity.github.io/trivy-repo/deb/public.key
+          state: present
 
     - name: Add Trivy repository
       apt_repository:
