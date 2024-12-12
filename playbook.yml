@@ -174,7 +174,7 @@
         
     - name: Pull Docker Image from ECR
       docker_image:
-        name: "{{ ACCOUNT_ID }}.dkr.ecr.{{ ecr_region }}.amazonaws.com/{{ ecr_repository }}:latest"
+        name: "{{ ecr_url }}/{{ ecr_repository }}:latest"
         source: pull
 
     - name: Scan Docker Image with Trivy
