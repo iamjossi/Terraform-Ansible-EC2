@@ -146,7 +146,23 @@
         aws configure set default.region {{ lookup('env', 'AWS_REGION') }}
     
     - name: Install Trivy
-      become: yes
+      become: true
+      tasks:
+    - name: Add Trivy repository key
+      apt_key:
+        url: https://aquasecurity.github.io/trivy-repo/deb/public.key
+        state: present
+
+    - name: Add Trivy repository
+      apt_repository:
+        repo: 'deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb generic main'
+        state: present
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install Trivy
       apt:
         name: trivy
         state: present
