@@ -146,25 +146,7 @@
         aws configure set default.region {{ lookup('env', 'AWS_REGION') }}
     
     - name: Install Trivy
-      hosts: example
-      become: true
-
-      tasks:
-    - name: Add Trivy repository key
-      apt_key:
-        url: https://aquasecurity.github.io/trivy-repo/deb/public.key
-        state: present
-
-    - name: Add Trivy repository
-      apt_repository:
-        repo: 'deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb generic main'
-        state: present
-
-    - name: Update apt cache
-      apt:
-        update_cache: yes
- 
-    - name: Install Trivy
+      become: yes
       apt:
         name: trivy
         state: present
@@ -183,7 +165,7 @@
 
     - name: Scan Docker Image with Trivy
       shell: |
-         cmd: trivy image --severity CRITICAL,HIGH {{ lookup('env', 'ECR_URL') }}/schoolapp:latest
+        trivy image --severity CRITICAL,HIGH {{ lookup('env', 'ECR_URL') }}/schoolapp:latest
       register: trivy_scan_results
 
     - name: Run Docker Container
