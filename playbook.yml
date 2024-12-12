@@ -140,7 +140,7 @@
         aws configure set default.region {{ lookup('env', 'AWS_REGION') }}
     - name: Install Trivy
       become: true
-      tasks:
+      block:
         - name: Add Trivy repository key
           apt_key:
             url: https://aquasecurity.github.io/trivy-repo/deb/public.key
