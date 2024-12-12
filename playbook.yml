@@ -57,20 +57,17 @@
         count: "{{ count }}"
         tags: "{{ tag_name }}"
       register: ec2_instance
-
     - name: Wait For Ec2 Instance to Initialize
       wait_for:
         host: "{{ ec2_instance.instances[0].public_ip_address }}"
         port: 22
         delay: 10
         timeout: 300
-        
     - name: Add EC2 Instance to Ansible Inventory
       add_host:
         name: "{{ item.public_ip_address }}"
         groups: provisioned
       with_items: "{{ ec2_instance.instances }}"
-      
 - name: Configure EC2 Instance
   hosts: provisioned
   become: yes
@@ -91,99 +88,91 @@
       get_url:
         url: https://download.docker.com/linux/ubuntu/gpg
         dest: /etc/apt/keyrings/docker.asc
-        mode: 0644
-        
+        mode: 644
     - name: Add Docker GPG key to apt keyring
       apt_key:
         file: /etc/apt/keyrings/docker.asc
         state: present
       become: yes
-
-        
     - name: Add Docker Repository to apt sources
       copy:
-        content: |
-          deb https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
+        content: >
+          deb https://download.docker.com/linux/ubuntu {{
+          ansible_distribution_release }} stable
         dest: /etc/apt/sources.list.d/docker.list
       become: yes
-
     - name: Install Docker
       apt:
         name: docker-ce
         state: present
         update_cache: yes
-
     - name: Start and Enable Docker
       service:
         name: docker
         state: started
         enabled: yes
-
     - name: Install unzip
       apt:
         name: unzip
         state: present
-
     - name: Install AWS CLI
-      shell: |
-        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+      shell: >
+        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o
+        "awscliv2.zip"
+
         unzip awscliv2.zip
+
         sudo ./aws/install
       register: aws_cli_installation
       ignore_errors: yes
-      
     - name: Wait for CLI
       wait_for:
         path: /usr/local/bin/aws
         state: present
         delay: 10
         timeout: 300
-        
     - name: AWS Configure
-      shell: |
+      shell: >
         aws configure set aws_access_key_id {{ lookup('env', 'ACCESS_KEY') }}
+
         aws configure set aws_secret_access_key {{ lookup('env', 'SECRET_ACCESS_KEY') }}
+
         aws configure set default.region {{ lookup('env', 'AWS_REGION') }}
-    
     - name: Install Trivy
       become: true
       tasks:
-      - name: Add Trivy repository key
-        apt_key:
-          url: https://aquasecurity.github.io/trivy-repo/deb/public.key
-          state: present
-
-    - name: Add Trivy repository
-      apt_repository:
-        repo: 'deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb generic main'
-        state: present
-
-    - name: Update apt cache
-      apt:
-        update_cache: yes
-
-    - name: Install Trivy
-      apt:
-        name: trivy
-        state: present
-
+        - name: Add Trivy repository key
+          apt_key:
+            url: https://aquasecurity.github.io/trivy-repo/deb/public.key
+            state: present
+        - name: Add Trivy repository
+          apt_repository:
+            repo: deb [signed-by=/usr/share/keyrings/trivy.gpg]
+              https://aquasecurity.github.io/trivy-repo/deb generic main
+            state: present
+        - name: Update apt cache
+          apt:
+            update_cache: yes
+        - name: Install Trivy
+          apt:
+            name: trivy
+            state: present
     - name: Login to AWS ECR
-      shell: |
-        aws ecr get-login-password --region {{ ecr_region }} | docker login --username AWS --password-stdin {{ ecr_url }}
+      shell: >
+        aws ecr get-login-password --region {{ ecr_region }} | docker login
+        --username AWS --password-stdin {{ ecr_url }}
       environment:
         AWS_ACCESS_KEY_ID: "{{ lookup('env', 'ACCESS_KEY') }}"
         AWS_SECRET_ACCESS_KEY: "{{ lookup('env', 'SECRET_ACCESS_KEY') }}"
-        
     - name: Pull Docker Image from ECR
       docker_image:
         name: "{{ lookup('env', 'ECR_URL') }}/schoolapp:latest"
         source: pull
-
     - name: Scan Docker Image with Trivy
-      shell: |
-        trivy image --severity CRITICAL,HIGH {{ lookup('env', 'ECR_URL') }}/schoolapp:latest
+      shell: >
+        trivy image --severity CRITICAL,HIGH {{ lookup('env', 'ECR_URL')
+        }}/schoolapp:latest
       register: trivy_scan_results
-
     - name: Run Docker Container
       docker_container:
         name: schoolapp
@@ -191,6 +180,4 @@
         state: started
         restart: yes
         ports:
-          - "3000:3000"
-
-  
+          - 3000:3000
