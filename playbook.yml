@@ -185,7 +185,7 @@
     - name: Run Docker Container
       docker_container:
         name: schoolapp
-        image: "{{ ecr_url }}/{{ ecr_image_url }}"
+        image:  "{{ ecr_image_url }}"
         state: started
         restart: yes
         ports:
