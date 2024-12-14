@@ -54,8 +54,7 @@
         wait: "{{ wait }}"
         region: "{{ region }}"
         key_name: "{{ keypair }}"
-        count: "{{ count }}"
-        exact_count: yes
+        exact_count: "{{ count }}"
         tags: "{{ tag_name }}"
       register: ec2_instance
 
