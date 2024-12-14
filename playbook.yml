@@ -55,6 +55,7 @@
         region: "{{ region }}"
         key_name: "{{ keypair }}"
         count: "{{ count }}"
+        exact_count: yes
         tags: "{{ tag_name }}"
       register: ec2_instance
 
