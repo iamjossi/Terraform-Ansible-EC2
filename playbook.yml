@@ -173,7 +173,7 @@
         AWS_SECRET_ACCESS_KEY: "{{ lookup('env', 'SECRET_ACCESS_KEY') }}"
         
     - name: Pull Docker Image from ECR
-      docker_image:
+      shell: |
         name: "{{ ecr_url }}/{{ ecr_repository }}:latest"
         source: pull
 
