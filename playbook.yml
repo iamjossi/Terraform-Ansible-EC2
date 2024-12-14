@@ -86,6 +86,7 @@
     ecr_region: eu-west-2
     ACCOUNT_ID: "{{ lookup('env', 'ACCOUNT_ID') }}"
     ecr_url: "{{ lookup('env', 'ECR_URL') }}"
+    ecr_image_url: "{{ ecr_url }}/{{ ecr_image }}:latest"
   tasks:
     - name: Download Dockers GPG Key
       get_url:
@@ -184,7 +185,7 @@
     - name: Run Docker Container
       docker_container:
         name: schoolapp
-        image: "{{ ecr_url }}/{{ ecr_image }}:latest"
+        image: "{{ ecr_image_url }}"
         state: started
         restart: yes
         ports:
