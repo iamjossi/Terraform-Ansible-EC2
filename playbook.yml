@@ -183,12 +183,7 @@
       register: trivy_scan_results
 
     - name: Run Docker Container
-      docker_container:
-        name: schoolapp
-        image:  "{{ ecr_image_url }}"
-        state: started
-        restart: yes
-        ports:
-          - "3000:3000"
+      shell: |
+        docker run -d -p 3000:3000 {{ ecr_url }}/{{ ecr_repository }}:latest
 
   
