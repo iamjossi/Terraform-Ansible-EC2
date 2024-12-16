@@ -1,0 +1,22 @@
+pipeline {
+    agent any
+    stages {
+        stage('cleanws') {
+            steps {
+                cleanWs()
+            }
+        }
+        stage('checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/iamjossi/Terraform-Ansible-EC2.git'
+            }
+        }
+        stage('ansible delete') {
+            steps {
+                withCredentials([aws(credentialsId: 'AWS')]) {
+                    sh "ansible-playbook playbook-delete.yml"
+                }
+            }
+        }
+    }   
+}
