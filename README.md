@@ -38,6 +38,9 @@ Set up credentials:
     AWS credentials set up as secret text,
     Account ID and Region set up as secret text,
 
+Create an SNS topic and subscription set as email.
+Create a cloudWatch alarm using metrics to trigger at CPU utilization at 50% and select SNS as notification channel.
+
 Create pipelines on jenkins. configure with pipeline script. 
    The Jenkins Setup script checks out github and deploys the playbook.yml file
    The Jenkins Delete script checks out github and deploys the playbook-delete.yml file
