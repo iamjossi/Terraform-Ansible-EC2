@@ -1,0 +1,15 @@
+{
+    "name": "schoolapp",
+    "version": "1.0.0",
+    "description": "A Node.js application for school",
+    "main": "app.js",
+    "scripts": {
+      "start": "node app.js"
+    },
+    "dependencies": {
+      "express": "^4.17.1"
+    },
+    "devDependencies": {},
+    "author": "Your Name",
+    "license": "MIT"
+  }
