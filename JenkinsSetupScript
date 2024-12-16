@@ -1,0 +1,46 @@
+pipeline {
+    agent any
+    tools {
+        ansible 'ansible'
+    }
+    environment {
+        ACCESS_KEY = credentials('ACCESS_KEY')
+        SECRET_ACCESS_KEY = credentials('SECRET_ACCESS_KEY')
+        ACCOUNT_ID =  credentials('ACCOUNT_ID')
+        AWS_REGION = 'eu-west-2'
+        ECR_URL = "${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+    }
+    stages {
+        stage('cleanws') {
+            steps {
+                cleanWs()
+            }
+        }
+        stage('checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/iamjossi/Terraform-Ansible-EC2.git'
+            }
+        }
+        stage('TRIVY FS SCAN') {
+            steps {
+                sh "trivy fs . > trivyfs.txt"
+            }
+        }
+        stage('Install Python and Ansible dependencies') {
+            steps {
+                sh "sudo apt-get update -y"
+                sh "sudo apt-get install -y python3-pip python3-full"
+                sh "python3 -m venv myenv"
+                sh "bash -c 'source myenv/bin/activate; pip install boto3 boto'"
+            }
+        }
+        stage('ansible provision') {
+            steps {
+                withCredentials([aws(credentialsId: 'AWS'),
+                                   sshUserPrivateKey(credentialsId: 'Girl', keyFileVariable: 'ANSIBLE_PRIVATE_KEY_FILE')]) {
+                    sh "ansible-playbook -i hosts.ini playbook.yml -e \"ansible_ssh_private_key_file=\${ANSIBLE_PRIVATE_KEY_FILE}\""
+                }
+            }
+        }
+    }
+}
